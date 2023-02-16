@@ -1,0 +1,16 @@
+<!--aiohttpdemo_polls/templates/index.html-->
+{% set title = "Main" %} 
+{% include 'header.html' %}
+<div class="container py-3">
+  <div class="row">
+    <div class="col-4 offset-4">
+      <form action="/create_name" method="post">
+        <label class="form-label">
+          Enter name
+        </label>
+        <input type="text" name="name" class="form-control"/>
+        <button class="btn btn-primary mt-2" type="submit">Enter</button>
+      </form>
+    </div>
+  </div>
+</div>

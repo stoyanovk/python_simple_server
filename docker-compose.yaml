@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  server:
+    build: './server'
+    command: python main.py
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgress_bd
+    volumes:
+      - ./server:/work/server
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgress_bd
+
+  lint:
+    image: python_internship_test_project_server
+    command: flake8
+    volumes:
+    - ./server:/work/server
+  
+  format:
+    image: python_internship_test_project_server
+    command: black . --exclude=venv 
+    volumes:
+    - ./server:/work/server
+  
+  init_db:
+    build: './server'
+    command: python init_db.py
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgress_bd
+    volumes:
+      - ./server:/work/server
+    depends_on:
+      - postgress_bd
+
+  postgress_bd:
+    image: postgres:14
+    restart: always
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/db
+    ports:
+      - '5432:5432'
+    stdin_open: true
+    tty: true
+
+volumes:
+  pgdata:
