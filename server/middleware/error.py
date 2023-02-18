@@ -10,9 +10,7 @@ async def error_middleware(request, handler):
         if response.status < 400:
             return response
 
-    except web.HTTPPaymentRequired as err:
-        print(err, "error")
-
-    return aiohttp_jinja2.render_template(
-        "error-page.html", request, {"error": response.reason}, status=404
-    )
+    except Exception as err:
+        return aiohttp_jinja2.render_template(
+            "error-page.html", request, {"error": err.body}, status=404
+        )
