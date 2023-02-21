@@ -6,8 +6,7 @@ async def select_names(conn, limit, page):
         f"SELECT * FROM names OFFSET {limit * (page - 1)} LIMIT {limit}"
     )
     records = await names_cursor.fetchall()
-    names = [dict(q) for q in records]
-    return names
+    return records
 
 
 async def get_total(conn):
@@ -18,9 +17,8 @@ async def get_total(conn):
 
 async def select_by_name(conn, name):
     cursor = await conn.execute("SELECT name FROM names WHERE name = %s", name)
-    records = await cursor.fetchall()
-    names = [dict(q) for q in records]
-    return names
+    records = await cursor.fetchone()
+    return records
 
 
 async def insert_name(conn, name):

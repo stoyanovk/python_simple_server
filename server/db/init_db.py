@@ -1,5 +1,5 @@
-from sqlalchemy import MetaData, create_engine
-from db.db import names
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base
 from config.config import CONFIG
 
 DB = CONFIG.get("POSTGRES_DB")
@@ -8,16 +8,12 @@ PASSWORD = CONFIG.get("POSTGRES_PASSWORD")
 HOST = CONFIG.get("POSTGRES_HOST")
 PORT = CONFIG.get("POSTGRES_PORT")
 
+Base = declarative_base()
 
 db_url = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB}"
 
-
-def create_tables(engine):
-    meta = MetaData()
-    meta.create_all(bind=engine, tables=[names])
+engine = create_engine(db_url)
 
 
-if __name__ == "__main__":
-    engine = create_engine(db_url)
-
-    create_tables(engine)
+def init_db():
+    Base.metadata.create_all(engine)
