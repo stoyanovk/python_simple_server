@@ -1,0 +1,10 @@
+aiohttp
+aiohttp-jinja2
+aiopg
+alembic
+SQLAlchemy==1.4.1
+python-dotenv
+
+black
+flake8
+pip-tools
