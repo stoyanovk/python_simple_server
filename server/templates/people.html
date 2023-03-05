@@ -1,15 +1,16 @@
 <!--aiohttpdemo_polls/templates/names.html-->
-{% set title = "List of names" %} {% include 'header.html' %}
+{% set title = "List of people" %} {% include 'header.html' %}
 <div class="container">
-  {% if names %}
+  {% if people %}
   <ul class="list-group my-3">
-    {% for item in names %}
+    {% for item in people %}
     <li class="list-group-item">{{ item.name }}</li>
     {% endfor %}
   </ul>
   {% else %}
   <p>No name are available.</p>
   {% endif %} 
+
   {% if pagination %}
   <nav aria-label="...">
     <ul class="pagination pagination-lg">
@@ -21,9 +22,9 @@
           </li>
           {% else %}
           <li class="page-item" aria-current="page">
-            <a href="/names?page={{item.number}}" class="page-link"
-              >{{ item.number }}</a
-            >
+            <a href="{{path}}?page={{item.number}}" class="page-link">
+              {{ item.number }}
+            </a>
           </li>
           {% endif %} 
         {% else %}

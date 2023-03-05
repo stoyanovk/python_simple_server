@@ -7,6 +7,9 @@ run: build
 db:
 	docker-compose up postgress_bd
 
+redis:
+	docker-compose up redis
+
 lint:
 	docker-compose up lint
 

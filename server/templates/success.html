@@ -1,0 +1,12 @@
+<!--aiohttpdemo_polls/templates/success.html-->
+{% set title = "Success" %}
+{% include 'header.html' %}
+
+<div class="container p-4">
+    <h1>Hello "{{name}}"</h1>
+{% if register_success %}
+    <p>You are registered</p>
+{% else %}
+    <p>You are login</p>
+{% endif %}
+</div>

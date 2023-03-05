@@ -7,15 +7,18 @@ services:
     env_file: .env
     environment:
       POSTGRES_HOST: postgress_bd
+      REDIS_HOST: redis
     volumes:
       - ./server:/work/server
     ports:
       - '3000:3000'
     depends_on:
       - postgress_bd
+      - redis
 
   lint:
-    image: python_internship_test_project_server
+    build: './server'
+    # image: python_internship_test_project_server
     command: flake8
     volumes:
     - ./server:/work/server
@@ -42,11 +45,20 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - pgdata:/var/lib/postgresql/db
+      - pgdata:/data
     ports:
       - '5432:5432'
     stdin_open: true
     tty: true
+  
+  redis:
+    image: redis:7.0.8-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
 
 volumes:
   pgdata:
+  redis_data:

@@ -1,0 +1,9 @@
+name: aiohttp_simple_server
+on: [push]
+jobs:
+  lints:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: lint
+        run: docker-compose up --abort-on-container-exit lint

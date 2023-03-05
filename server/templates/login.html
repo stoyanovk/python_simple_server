@@ -1,0 +1,15 @@
+<!--aiohttpdemo_polls/templates/login.html-->
+{% set title = "Login" %} {% include 'header.html' %}
+<div class="container py-3">
+  <div class="row">
+    <div class="col-4 offset-4">
+      <form action="/login" method="post" >
+        <label class="form-label"> Login </label>
+        <input type="text" name="name" class="form-control" />
+        <label class="form-label"> Password </label>
+        <input type="password" name="password" class="form-control" />
+        <button class="btn btn-primary mt-2" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>

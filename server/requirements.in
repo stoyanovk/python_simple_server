@@ -4,6 +4,9 @@ aiopg
 alembic
 SQLAlchemy==1.4.1
 python-dotenv
+aiohttp-session
+aioredis
+bcrypt
 
 black
 flake8
