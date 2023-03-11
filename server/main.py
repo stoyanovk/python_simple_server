@@ -5,7 +5,7 @@ import aiohttp_jinja2
 from routes.people import routes as people_routes
 from routes.auth import routes as auth_routes
 
-from db.pg_context import pg_context
+from db.pg_context import async_session
 from config.config import CONFIG, BASE_DIR
 from middleware.error import error_middleware
 from middleware.redis import get_session_middleware
@@ -30,8 +30,9 @@ async def make_app():
     app.add_routes(people_routes)
     app.add_routes(auth_routes)
 
-    init_db()
-    app.cleanup_ctx.append(pg_context)
+    await init_db()
+    app["db"] = async_session
+
     return app
 
 

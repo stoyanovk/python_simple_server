@@ -1,17 +1,17 @@
-from aiopg.sa import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
+from config.config import CONFIG
+
+DB = CONFIG.get("POSTGRES_DB")
+USER = CONFIG.get("POSTGRES_USER")
+PASSWORD = CONFIG.get("POSTGRES_PASSWORD")
+HOST = CONFIG.get("POSTGRES_HOST")
+PORT = CONFIG.get("POSTGRES_PORT")
+
+engine = create_async_engine(
+    f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB}",
+)
 
 
-async def pg_context(app):
-    engine = await create_engine(
-        database=app["config"].get("POSTGRES_DB"),
-        user=app["config"].get("POSTGRES_USER"),
-        password=app["config"].get("POSTGRES_PASSWORD"),
-        host=app["config"].get("POSTGRES_HOST"),
-        port=app["config"].get("POSTGRES_PORT"),
-    )
-    app["db"] = engine
-
-    yield
-
-    app["db"].close()
-    await app["db"].wait_closed()
+async_session = async_sessionmaker(engine)

@@ -1,8 +1,9 @@
 aiohttp
 aiohttp-jinja2
-aiopg
 alembic
-SQLAlchemy==1.4.1
+SQLAlchemy==2.0.4
+psycopg
+sqlalchemy[asyncio]
 python-dotenv
 aiohttp-session
 aioredis

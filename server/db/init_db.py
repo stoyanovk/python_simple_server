@@ -1,44 +1,41 @@
+from typing import List
 from sqlalchemy import (
-    create_engine,
-    Column,
-    Integer,
     String,
     ForeignKey,
     DateTime,
     LargeBinary,
 )
-from sqlalchemy.orm import declarative_base
-from config.config import CONFIG
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
+from db.pg_context import engine
 
-DB = CONFIG.get("POSTGRES_DB")
-USER = CONFIG.get("POSTGRES_USER")
-PASSWORD = CONFIG.get("POSTGRES_PASSWORD")
-HOST = CONFIG.get("POSTGRES_HOST")
-PORT = CONFIG.get("POSTGRES_PORT")
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 
 class People(Base):
     __tablename__ = "people"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100))
-    last_visit = Column(DateTime)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), index=True)
+    last_visit: Mapped[DateTime | None] = mapped_column(DateTime)
+    view_count: Mapped[int]
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["Users"] = relationship(back_populates="people")
+
+
+# back_populates= ??
 
 
 class Users(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String(100), nullable=False)
-    name = Column(String(100), nullable=False)
-    password = Column(LargeBinary(), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(String(100))
+    password: Mapped[LargeBinary] = mapped_column(LargeBinary())
+    people: Mapped[List["People"]] = relationship(back_populates="user")
 
 
-db_url = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB}"
-
-engine = create_engine(db_url)
-
-
-def init_db():
-    Base.metadata.create_all(engine)
+async def init_db():
+    async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)

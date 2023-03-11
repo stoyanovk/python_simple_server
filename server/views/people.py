@@ -6,7 +6,9 @@ from repositories.people import (
     get_total,
     select_by_name,
     insert_person,
-    update_last_visit,
+    update_person,
+    select_users,
+    select_people_with_views,
 )
 
 
@@ -16,79 +18,72 @@ async def main_page(request):
     )
 
 
+def render_answer_template(request, is_name_exist, name):
+    return aiohttp_jinja2.render_template(
+        "answer.html",
+        request,
+        context={
+            "is_name_exist": is_name_exist,
+            "name": name,
+            "user": request.app.get("user", None),
+        },
+    )
+
+
 async def create_person(request):
     data = await request.post()
     name = data.get("name")
+    user = request.app.get("user", None)
+    user_id = user and user["id"]
+
     if len(name.rstrip()) < 2:
         raise web.HTTPBadRequest(reason="Name must be more then 2 letters")
 
-    async with request.app["db"].acquire() as conn:
-        row_name = await select_by_name(conn=conn, name=name)
-        if row_name:
-            fetched_name = row_name.get("name", "")
-            await update_last_visit(conn, fetched_name)
-            return aiohttp_jinja2.render_template(
-                "answer.html",
-                request,
-                context={
-                    "is_name_exist": True,
-                    "name": name,
-                    "user": request.app.get("user", None),
-                },
-            )
-        else:
-            user = request.app.get("user", None)
-
-            # I donn't now how i can write it in different way
-            if user:
-                await insert_person(conn, name, user["id"])
+    async with request.app["db"]() as conn:
+        async with conn.begin():
+            person = await select_by_name(conn=conn, name=name, user_id=user_id)
+            if person:
+                await update_person(conn, person.name, person.view_count)
+                return render_answer_template(request, True, name)
             else:
-                await insert_person(conn, name)
-
-            return aiohttp_jinja2.render_template(
-                "answer.html",
-                request,
-                context={
-                    "is_name_exist": False,
-                    "name": name,
-                    "user": request.app.get("user", None),
-                },
-            )
+                await insert_person(conn, name, user_id)
+                return render_answer_template(request, False, name)
 
 
 async def get_people(request):
-    async with request.app["db"].acquire() as conn:
-        path = request.path
+    async with request.app["db"]() as conn:
+        async with conn.begin():
+            path = request.path
 
-        if request.rel_url.query.get("page", None) == "1":
-            return web.HTTPFound(location=path)
+            if request.rel_url.query.get("page", None) == "1":
+                return web.HTTPFound(location=path)
 
-        page = int(request.rel_url.query.get("page", 1))
-        limit = int(request.rel_url.query.get("limit", 5))
+            page = int(request.rel_url.query.get("page", 1))
+            limit = int(request.rel_url.query.get("limit", 5))
 
-        people = await select_people(conn=conn, limit=limit, page=page)
+            people = await select_people(conn=conn, limit=limit, page=page)
 
-        total = await get_total(conn)
+            total = await get_total(conn)
 
-        pagination = get_pagination(page=page, limit=limit, total=total)
+            pagination = get_pagination(page=page, limit=limit, total=total)
 
-        return aiohttp_jinja2.render_template(
-            "people.html",
-            request,
-            context={
-                "people": people,
-                "pagination": pagination,
-                "path": path,
-                "user": request.app.get("user", None),
-            },
-        )
+            return aiohttp_jinja2.render_template(
+                "people.html",
+                request,
+                context={
+                    "people": people,
+                    "pagination": pagination,
+                    "path": path,
+                    "user": request.app.get("user", None),
+                },
+            )
 
 
 async def get_user_people(request):
     user = request.app.get("user", None)
     if not user:
         return web.HTTPFound(location="/people")
-    async with request.app["db"].acquire() as conn:
+    async with request.app["db"]() as conn:
         path = request.path
 
         if request.rel_url.query.get("page", None) == "1":
@@ -112,6 +107,21 @@ async def get_user_people(request):
                 "people": people,
                 "pagination": pagination,
                 "path": path,
+                "user": request.app.get("user", None),
+            },
+        )
+
+
+async def get_leader_board(request):
+    async with request.app["db"]() as conn:
+        users = await select_users(conn)
+        people = await select_people_with_views(conn)
+        return aiohttp_jinja2.render_template(
+            "leader-board.html",
+            request,
+            context={
+                "people": people,
+                "users": users,
                 "user": request.app.get("user", None),
             },
         )
