@@ -10,8 +10,8 @@ db:
 redis:
 	docker-compose up redis
 
-lint:
-	docker-compose up lint
+lint: build
+	docker-compose run lint
 
-format:
-	docker-compose up format
+format: build
+	docker-compose run format
