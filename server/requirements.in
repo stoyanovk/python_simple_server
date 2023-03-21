@@ -2,7 +2,7 @@ aiohttp
 aiohttp-jinja2
 alembic
 SQLAlchemy==2.0.4
-psycopg
+psycopg[binary,pool]
 sqlalchemy[asyncio]
 python-dotenv
 aiohttp-session
@@ -12,3 +12,4 @@ bcrypt
 black
 flake8
 pip-tools
+mypy

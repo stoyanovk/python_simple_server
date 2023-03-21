@@ -1,7 +1,7 @@
 build:
 	docker-compose build server
 
-run: build
+run:
 	docker-compose up server
 
 db:
@@ -15,3 +15,9 @@ lint: build
 
 format: build
 	docker-compose run format
+
+check-format: build
+	docker-compose run check-format
+
+types: build
+	docker-compose run types

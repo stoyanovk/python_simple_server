@@ -1,9 +1,13 @@
 from datetime import datetime
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update, insert, text, and_
 from db.init_db import People, Users
+from typing import Optional
 
 
-async def select_people(conn, limit, page, user_id=None):
+async def select_people(
+    conn: AsyncSession, limit: int, page: int, user_id: Optional[int] = None
+):
     query = select(People)
     if user_id:
         query = query.where(People.user_id == user_id)
@@ -14,7 +18,7 @@ async def select_people(conn, limit, page, user_id=None):
     return records.scalars().all()
 
 
-async def get_total(conn, user_id=None):
+async def get_total(conn: AsyncSession, user_id: Optional[int] = None) -> int:
     query = select(func.count(People.id))
     if user_id:
         query = query.where(People.user_id == user_id)
@@ -23,17 +27,23 @@ async def get_total(conn, user_id=None):
     return total.scalar_one()
 
 
-async def select_by_name(conn, name, user_id):
-    # query = select(People).filter(People.name == name and People.user_id.is_(None))
-    # WHERE name = 'Jake' AND not user_id;
-    user_condition = People.user_id == user_id if user_id else text("user_id IS NULL")
-    query = select(People).where(and_(People.name == name, user_condition))
+async def select_by_name(
+    conn: AsyncSession, name: str, user_id: int | None
+) -> People | None:
+    query = select(People).where(
+        and_(
+            People.name == name,
+            People.user_id == user_id if user_id else text("user_id IS NULL"),
+        )
+    )
     records = await conn.execute(query)
     result = records.scalar_one_or_none()
     return result
 
 
-async def insert_person(conn, name, user_id=None):
+async def insert_person(
+    conn: AsyncSession, name: str, user_id: int | None = None
+) -> None:
     await conn.execute(
         insert(People).values(
             name=name, user_id=user_id, last_visit=datetime.now(), view_count=0
@@ -42,7 +52,7 @@ async def insert_person(conn, name, user_id=None):
     await conn.commit()
 
 
-async def update_person(conn, name, view_count):
+async def update_person(conn: AsyncSession, name: str, view_count: int) -> None:
     await conn.execute(
         update(People)
         .where(People.name == name)
@@ -50,7 +60,7 @@ async def update_person(conn, name, view_count):
     )
 
 
-async def select_users(conn):
+async def select_users(conn: AsyncSession):
     query = (
         select(
             func.sum(People.view_count).label("view_count"), People.user_id, Users.name
@@ -62,7 +72,7 @@ async def select_users(conn):
     return records.all()
 
 
-async def select_people_with_views(conn):
+async def select_people_with_views(conn: AsyncSession):
     result = await conn.execute(
         select(func.sum(People.view_count).label("count_sum"), People.name)
         .group_by(People.name)

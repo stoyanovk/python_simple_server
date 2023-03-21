@@ -23,15 +23,12 @@ class People(Base):
     user: Mapped["Users"] = relationship(back_populates="people")
 
 
-# back_populates= ??
-
-
 class Users(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(100))
     name: Mapped[str] = mapped_column(String(100))
-    password: Mapped[LargeBinary] = mapped_column(LargeBinary())
+    password: Mapped[bytes] = mapped_column(LargeBinary())
     people: Mapped[List["People"]] = relationship(back_populates="user")
 
 

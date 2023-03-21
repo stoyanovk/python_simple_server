@@ -12,5 +12,5 @@ async def error_middleware(request, handler):
 
     except Exception as err:
         return aiohttp_jinja2.render_template(
-            "error-page.html", request, {"error": err.reason}, status=404
+            "error-page.html", request, {"error": err.reason}, status=404  # type: ignore
         )

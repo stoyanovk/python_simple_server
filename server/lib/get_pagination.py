@@ -3,16 +3,19 @@ from dataclasses import dataclass
 
 @dataclass
 class Button:
-    number: int = None
+    number: int | None = None
     dots: bool = False
     is_active: bool = False
 
 
-def get_pagination(page, total, limit):
-    pages = list()
-    current_page = page
-    last_page = round(total / limit)
-    neighbor = 1
+Buttons = list[Button]
+
+
+def get_pagination(page: int, total: int, limit: int) -> Buttons:
+    pages: Buttons = list()
+    current_page: int = page
+    last_page: int = round(total / limit)
+    neighbor: int = 1
 
     if total / limit < 1:
         return pages

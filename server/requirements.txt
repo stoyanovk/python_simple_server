@@ -61,8 +61,12 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
+mypy==1.1.1
+    # via -r requirements.in
 mypy-extensions==1.0.0
-    # via black
+    # via
+    #   black
+    #   mypy
 packaging==23.0
     # via
     #   black
@@ -73,8 +77,12 @@ pip-tools==6.12.2
     # via -r requirements.in
 platformdirs==3.0.0
     # via black
-psycopg==3.1.8
+psycopg[binary,pool]==3.1.8
     # via -r requirements.in
+psycopg-binary==3.1.8
+    # via psycopg
+psycopg-pool==3.1.6
+    # via psycopg
 pycodestyle==2.10.0
     # via flake8
 pyflakes==3.0.1
@@ -91,10 +99,13 @@ tomli==2.0.1
     # via
     #   black
     #   build
+    #   mypy
 typing-extensions==4.5.0
     # via
     #   aioredis
+    #   mypy
     #   psycopg
+    #   psycopg-pool
     #   sqlalchemy
 wheel==0.38.4
     # via pip-tools

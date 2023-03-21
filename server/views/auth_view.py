@@ -3,8 +3,10 @@ import aiohttp_jinja2
 from aiohttp_session import get_session
 from lib import password_utils
 from lib.validators import Validator
+from db.init_db import Users
+from repositories.user_repositories import create_user as insert_user, get_user_by_name
 
-from repositories.user import create_user as insert_user, get_user_by_name
+from typing import TypedDict
 
 
 def register_page(request):
@@ -19,9 +21,16 @@ def login_page(request):
     return aiohttp_jinja2.render_template("login.html", request, {})
 
 
+class CreateUserBody(TypedDict):
+    name: str
+    email: str
+    password: str
+    password_repeated: str
+
+
 async def create_user(request):
     try:
-        body = await request.post()
+        body: CreateUserBody = await request.post()
         Validator(body["name"]).add(lambda a: not len(a), "Name can' be empty").add(
             lambda value: len(value) > 20, "Name can' be bigger then 20"
         ).check()
@@ -36,7 +45,7 @@ async def create_user(request):
             lambda value: value != body["password_repeated"], "Passwords must be equal"
         ).check()
 
-        password = password_utils.generate_password(body["password"])
+        password: bytes = password_utils.generate_password(body["password"])
 
         async with request.app["db"]() as conn:
             await insert_user(conn, body["name"], body["email"], password)
@@ -47,23 +56,26 @@ async def create_user(request):
                 context={"register_success": True, "name": body["name"]},
             )
     except ValueError as err:
-        raise web.HTTPBadRequest(reason=err)
+        if isinstance(err, str):
+            raise web.HTTPBadRequest(reason=err)
+
+    return None
 
 
 async def login(request):
     try:
-        body = await request.post()
+        body: dict = await request.post()
         Validator(body["name"]).add(lambda a: not len(a), "Name can' be empty").check()
         Validator(body["password"]).add(
             lambda a: not len(a), "Password can' be empty"
         ).check()
 
         async with request.app["db"]() as conn:
-            user = await get_user_by_name(conn, body["name"])
+            user: Users | None = await get_user_by_name(conn, body["name"])
             if not user:
                 raise web.HTTPBadRequest(reason="User with such login not found")
 
-            is_correct_password = password_utils.check_password(
+            is_correct_password: bool = password_utils.check_password(
                 body["password"], user.password
             )
 
@@ -80,10 +92,11 @@ async def login(request):
                 context={"register_success": False, "name": body["name"]},
             )
     except ValueError as err:
-        raise web.HTTPBadRequest(reason=err)
+        if isinstance(err, str):
+            raise web.HTTPBadRequest(reason=err)
 
 
-async def logout(request):
+async def logout(request) -> web.HTTPSeeOther:
     session = await get_session(request)
     session["user"] = None
     return web.HTTPSeeOther(location="/")
