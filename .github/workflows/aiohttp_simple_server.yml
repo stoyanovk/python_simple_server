@@ -6,4 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: lint
-        run: docker-compose up --abort-on-container-exit lint
+        run: make lint
+      - name: types
+        run: make types

@@ -1,6 +1,5 @@
 from aiohttp import web
-from views.auth import register_page, login_page, create_user, login, logout
-
+from views.auth_view import register_page, login_page, create_user, login, logout
 
 routes = [
     web.get("/register", register_page),

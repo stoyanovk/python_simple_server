@@ -2,21 +2,21 @@ from aiohttp import web
 import jinja2
 import aiohttp_jinja2
 
-from routes.people import routes as people_routes
-from routes.auth import routes as auth_routes
+from routes.people_routes import routes as people_routes
+from routes.auth_routes import routes as auth_routes
 
 from db.pg_context import async_session
 from config.config import CONFIG, BASE_DIR
 from middleware.error import error_middleware
 from middleware.redis import get_session_middleware
-from middleware.user import add_user_middleware
+from middleware.add_user_middleware import add_user_middleware
 from db.init_db import init_db
 
 
 async def make_app():
     app = web.Application(
         middlewares=[
-            error_middleware,
+            error_middleware,  # type: ignore
             await get_session_middleware(),
             add_user_middleware,
         ]
@@ -36,7 +36,7 @@ async def make_app():
     return app
 
 
-web.run_app(make_app(), port=CONFIG.get("APP_PORT"))
+web.run_app(make_app(), port=3000)
 
 # import sys
 # print(sys.executable)

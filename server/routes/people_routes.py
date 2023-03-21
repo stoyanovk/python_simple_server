@@ -1,5 +1,5 @@
 from aiohttp import web
-from views.people import (
+from views.people_view import (
     main_page,
     create_person,
     get_people,

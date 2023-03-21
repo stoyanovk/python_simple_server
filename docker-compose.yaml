@@ -25,7 +25,15 @@ services:
   
   format:
     <<: *base
-    command: black . --exclude=venv 
+    command: black . --exclude=venv
+
+  check-format:
+    <<: *base
+    command: black . --exclude=venv  
+  
+  types:
+    <<: *base
+    command: mypy . 
 
   postgress_bd:
     image: postgres:14
