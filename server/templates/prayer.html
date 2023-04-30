@@ -1,0 +1,18 @@
+<!--aiohttpdemo_polls/templates/names.html-->
+{% set title = "List of prayers" %} {% include 'header.html' %}
+<div class="container">
+{% if can_edit %}
+  <div class="d-flex my-3">
+    <a class="me-4" href="/prayers/edit/{{prayer.id}}">Edit prayer</a>
+  </div>
+{% endif %}
+  
+  <div class="my-3">
+    <h1>{{prayer.title}}</h1>
+  </div>
+  <p class="my-3">
+    {{prayer.text}}
+  </p>
+ 
+
+ 

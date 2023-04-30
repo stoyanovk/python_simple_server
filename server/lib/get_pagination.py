@@ -14,9 +14,9 @@ Buttons = list[Button]
 def get_pagination(page: int, total: int, limit: int) -> Buttons:
     pages: Buttons = list()
     current_page: int = page
-    last_page: int = round(total / limit)
-    neighbor: int = 1
 
+    last_page: int | float = total / limit
+    neighbor: int = 1
     if total / limit < 1:
         return pages
 
@@ -38,5 +38,5 @@ def get_pagination(page: int, total: int, limit: int) -> Buttons:
         pages.append(Button(dots=True))
 
     if current_page + neighbor <= last_page:
-        pages.append(Button(last_page))
+        pages.append(Button(round(last_page)))
     return pages

@@ -1,7 +1,8 @@
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update, insert, text, and_
-from db.init_db import People, Users
+from db.people import People
+from db.users import Users
 from typing import Optional
 
 

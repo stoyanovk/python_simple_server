@@ -6,10 +6,12 @@ psycopg[binary,pool]
 sqlalchemy[asyncio]
 python-dotenv
 aiohttp-session
-aioredis
+redis
 bcrypt
 
 black
 flake8
 pip-tools
 mypy
+pytest
+pytest-asyncio

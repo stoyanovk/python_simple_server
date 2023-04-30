@@ -1,7 +1,7 @@
 from aiohttp import web
 from collections.abc import Sequence
 import aiohttp_jinja2
-from db.init_db import People
+from db.people import People
 from lib.get_pagination import get_pagination, Button
 from repositories.people_repositories import (
     select_people,
@@ -21,7 +21,7 @@ async def main_page(request) -> web.StreamResponse:
     )
 
 
-def render_answer_template(request, is_name_exist, name) -> web.StreamResponse:
+def render_answer_template(request, is_name_exist, name):
     return aiohttp_jinja2.render_template(
         "answer.html",
         request,
@@ -68,7 +68,7 @@ async def get_people(request) -> web.HTTPFound | web.StreamResponse:
                 return web.HTTPFound(location=path)
 
             page: int = int(request.rel_url.query.get("page", 1))
-            limit: int = int(request.rel_url.query.get("limit", 5))
+            limit: int = int(request.rel_url.query.get("limit", 2))
 
             people: Sequence[People] = await select_people(
                 conn=conn, limit=limit, page=page

@@ -1,0 +1,28 @@
+<!--aiohttpdemo_polls/templates/login.html-->
+{% set title = "Create Prayer" %} {% include 'header.html' %}
+<div class="container py-3">
+  {% if is_edit %}
+  <h1>Edit Prayer</h1>
+  {% else %}
+  <h1>Create Prayer</h1>
+  {% endif %}
+  <div class="row">
+    <div class="col-6 offset-3">
+      {% if is_edit %}
+      <form action="/prayers/edit/{{id}}" method="put">
+        <label class="form-label"> Title </label>
+        <input type="text" name="title" class="form-control" value="{{prayer.title}}"/>
+        <textarea name="text" class="form-control mt-3" placeholder="Leave a comment here" style="height: 100px">{{prayer.text}}</textarea>
+        <button class="btn btn-primary mt-2" type="submit">Submit</button>
+      </form>
+      {% else %}
+      <form action="/prayers/create" method="post" >
+        <label class="form-label"> Title </label>
+        <input type="text" name="title" class="form-control" />
+        <textarea name="text" class="form-control mt-3" placeholder="Leave a comment here" style="height: 100px"></textarea>
+        <button class="btn btn-primary mt-2" type="submit">Submit</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>

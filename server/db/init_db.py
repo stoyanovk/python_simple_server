@@ -1,38 +1,26 @@
-from typing import List
-from sqlalchemy import (
-    String,
-    ForeignKey,
-    DateTime,
-    LargeBinary,
-)
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
-from db.pg_context import engine
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.orm import registry
+
+reg = registry()
 
 
-class Base(DeclarativeBase):
-    pass
+def get_async_engine(config):
+    USER = config["POSTGRES_USER"]
+    PASSWORD = config["POSTGRES_PASSWORD"]
+    HOST = config["POSTGRES_HOST"]
+    PORT = config["POSTGRES_PORT"]
+    DB = config["POSTGRES_DB"]
+    return create_async_engine(
+        f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB}",
+    )
 
 
-class People(Base):
-    __tablename__ = "people"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(100), index=True)
-    last_visit: Mapped[DateTime | None] = mapped_column(DateTime)
-    view_count: Mapped[int]
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["Users"] = relationship(back_populates="people")
+def get_async_session(config):
+    return async_sessionmaker(get_async_engine(config))
 
 
-class Users(Base):
-    __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(100))
-    name: Mapped[str] = mapped_column(String(100))
-    password: Mapped[bytes] = mapped_column(LargeBinary())
-    people: Mapped[List["People"]] = relationship(back_populates="user")
-
-
-async def init_db():
-    async with engine.begin() as conn:
+async def init_db(config):
+    async with get_async_engine(config).begin() as conn:
         # await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reg.metadata.create_all)

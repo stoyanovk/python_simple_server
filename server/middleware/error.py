@@ -6,11 +6,12 @@ import aiohttp_jinja2
 async def error_middleware(request, handler):
     try:
         response = await handler(request)
-
-        if response.status < 400:
-            return response
+        return response
 
     except Exception as err:
-        return aiohttp_jinja2.render_template(
-            "error-page.html", request, {"error": err.reason}, status=404  # type: ignore
-        )
+        if isinstance(err, web.HTTPError):
+            return aiohttp_jinja2.render_template(
+                "error-page.html", request, {"error": err.reason}, status=404
+            )
+        else:
+            return err

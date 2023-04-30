@@ -21,3 +21,6 @@ check-format: build
 
 types: build
 	docker-compose run types
+
+tests: build
+	docker-compose run tests

@@ -3,7 +3,7 @@ import aiohttp_jinja2
 from aiohttp_session import get_session
 from lib import password_utils
 from lib.validators import Validator
-from db.init_db import Users
+from db.users import Users
 from repositories.user_repositories import create_user as insert_user, get_user_by_name
 
 from typing import TypedDict

@@ -1,6 +1,6 @@
 from sqlalchemy.sql import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.init_db import Users
+from db.users import Users
 from typing import Optional
 
 
