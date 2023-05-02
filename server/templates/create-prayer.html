@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-6 offset-3">
       {% if is_edit %}
-      <form action="/prayers/edit/{{id}}" method="put">
+      <form action="/prayers/edit/{{prayer.id}}" method="post">
         <label class="form-label"> Title </label>
         <input type="text" name="title" class="form-control" value="{{prayer.title}}"/>
         <textarea name="text" class="form-control mt-3" placeholder="Leave a comment here" style="height: 100px">{{prayer.text}}</textarea>

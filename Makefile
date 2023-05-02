@@ -4,6 +4,9 @@ build:
 run:
 	docker-compose up server
 
+fill-db:
+	docker-compose run fill-db
+
 db:
 	docker-compose up postgress_bd
 

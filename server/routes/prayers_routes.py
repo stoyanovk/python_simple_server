@@ -5,7 +5,8 @@ from views.prayers_views import (
     get_prayers_by_id,
     delete_prayer,
     render_create_prayers,
-    render_edit_prayers
+    render_edit_prayers,
+    update_prayer
 )
 
 
@@ -15,6 +16,6 @@ routes = [
     web.get("/prayers/edit/{id}", render_edit_prayers),
     web.get("/prayers/{id}", get_prayers_by_id),
     web.post("/prayers/create", create_prayer),
-    web.put("/prayers/edit/{id}", create_prayer),
+    web.post("/prayers/edit/{id}", update_prayer),
     web.delete("/prayers/{id}", delete_prayer),
 ]

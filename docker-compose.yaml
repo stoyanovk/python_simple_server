@@ -19,6 +19,12 @@ services:
       - postgress_bd
       - redis
 
+  fill-db:
+    <<: *base
+    command: python fill_db.py
+    depends_on:
+      - postgress_bd
+
   lint:
     <<: *base
     command: flake8

@@ -7,7 +7,9 @@ from repositories.prayers_repositories import (
     select_prayers,
     get_total,
     delete_prayer as remove_prayer,
-    select_by_prayer_by_id,
+    select_prayer_by_id,
+    update_prayer_data,
+    select_prayer_by_id_and_user_id,
 )
 from lib.get_pagination import get_pagination, Button
 
@@ -18,7 +20,7 @@ async def render_create_prayers(request):
 
 async def render_edit_prayers(request):
     async with request.app["db"]() as conn:
-        prayer = await select_by_prayer_by_id(conn, int(request.match_info["id"]))
+        prayer = await select_prayer_by_id(conn, int(request.match_info["id"]))
         if not prayer:
             return web.HTTPFound(location="/prayers")
         return aiohttp_jinja2.render_template(
@@ -38,6 +40,29 @@ async def create_prayer(request):
     async with request.app["db"]() as conn:
         await insert_prayer(conn, title, text, user["id"])
 
+        return web.HTTPFound(location="/prayers")
+
+
+async def update_prayer(request):
+    user: dict = request.app.get("user", None)
+    data: dict = await request.post()
+    title: str | None = data.get("title", None)
+    text: str | None = data.get("text", None)
+    prayer_id: int = int(request.match_info["id"])
+    if not user or not user.get("id", None):
+        raise web.HTTPBadRequest(reason="You should be auth")
+
+    async with request.app["db"]() as conn:
+        prayer = await select_prayer_by_id_and_user_id(conn, prayer_id, user["id"])
+
+    if not prayer:
+        raise web.HTTPBadRequest(reason="You shouldn't edit this prayer")
+    if not title:
+        raise web.HTTPBadRequest(reason="Title can't be empty")
+    if not text:
+        raise web.HTTPBadRequest(reason="Text can't be empty")
+    async with request.app["db"]() as conn:
+        await update_prayer_data(conn, prayer_id, title, text)
         return web.HTTPFound(location="/prayers")
 
 
