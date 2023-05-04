@@ -5,6 +5,9 @@ from typing import Callable
 
 @web.middleware
 async def add_user_middleware(request, handler) -> Callable:
-    session: Session = await get_session(request)
-    request.app["user"] = session.get("user", None)
-    return await handler(request)
+    try:
+        session: Session = await get_session(request)
+        request.app["user"] = session.get("user", None)
+        return await handler(request)
+    except Exception as err:
+        raise err
