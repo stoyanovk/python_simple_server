@@ -1,18 +1,39 @@
 <!--aiohttpdemo_polls/templates/names.html-->
 {% set title = "List of prayers" %} {% include 'header.html' %}
 <div class="container">
-{% if can_edit %}
+  {% if can_edit %}
   <div class="d-flex my-3">
     <a class="me-4" href="/prayers/edit/{{prayer.id}}">Edit prayer</a>
   </div>
-{% endif %}
-  
+  {% endif %}
+
   <div class="my-3">
     <h1>{{prayer.title}}</h1>
   </div>
-  <p class="my-3">
-    {{prayer.text}}
-  </p>
- 
-
- 
+  <div class="row my-3">
+    <div class="col-4">
+      <p class="">
+        {{prayer.text}}
+      </p>
+    </div>
+    <div class="col-4">
+      <h3>This prayer was assigned next user</h3>
+      <ul class="list-group">
+        {% for item in prayer_users %}
+        <li class="list-group-item d-flex justify-content-between">{{item.name}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-4">
+      <form action="/prayers/assign/{{prayer.id}}" method="post">
+        <select class="form-select" multiple name="user_ids">
+          {% for item in users %}
+          <option value="{{item.id}}">{{item.name}}</option>
+          {% endfor %}
+        </select>
+        <div class="my-3">
+          <button type="submit" class="btn btn-primary">assign</button>
+        </div>
+      </form>
+    </div>
+  </div>

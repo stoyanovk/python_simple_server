@@ -32,7 +32,6 @@ def test_pagination():
         Button(number=4),
         Button(number=5),
     ]
-    print(result)
     assert result == expected
 
     # Test case 4

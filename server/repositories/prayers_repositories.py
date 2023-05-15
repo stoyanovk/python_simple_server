@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update, insert, delete, and_
 from db.prayers import Prayers
+from db.users_prayers import Users_prayers
+from db.users import Users
 
 
 async def select_prayers(conn: AsyncSession, limit: int, page: int):
@@ -66,3 +68,47 @@ async def update_prayer_data(
 async def delete_prayer(conn: AsyncSession, prayer_id: int):
     await conn.execute(delete(Prayers).where(Prayers.id == prayer_id))
     await conn.commit()
+
+
+async def get_assigned_prayers_by_user_id(conn: AsyncSession, user_id: int):
+    query = (
+        select(
+            Prayers.id,
+            Prayers.title,
+            Users_prayers.user_id,
+            func.substr(Prayers.text, 0, 100).label("short_description"),
+        )
+        .join(Users_prayers)
+        .filter(Users_prayers.user_id == user_id)
+    )
+
+    records = await conn.execute(query)
+
+    return records.all()
+
+
+async def assign_prayer_to_user(
+    conn: AsyncSession, user_ids: list[int], prayer_id: int
+):
+    insert_values = list(
+        map(lambda user_id: {"user_id": user_id, "prayer_id": prayer_id}, user_ids)
+    )
+    await conn.execute(
+        insert(Users_prayers),
+        insert_values,
+    )
+    await conn.commit()
+
+
+async def get_prayer_users(conn, prayer_id):
+    query = (
+        select(Users.id, Users.name, Users_prayers.prayer_id)
+        .join(
+            Users_prayers,
+            and_(
+                Users.id == Users_prayers.user_id, Users_prayers.prayer_id == prayer_id
+            ),
+        )
+    )
+    result = await conn.execute(query)
+    return result.all()
