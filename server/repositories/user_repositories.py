@@ -17,6 +17,11 @@ async def get_user_by_name(conn: AsyncSession, name: str) -> Optional[Users]:
     return result.scalar_one_or_none()
 
 
+async def get_user_by_id(conn: AsyncSession, id: int) -> Optional[Users]:
+    result = await conn.execute(select(Users).where(Users.id == id))
+    return result.scalar_one_or_none()
+
+
 async def get_users(conn: AsyncSession, prayer_id):
     query = (
         select(Users.id, Users.name, Users_prayers.prayer_id)
@@ -27,6 +32,16 @@ async def get_users(conn: AsyncSession, prayer_id):
             ),
         )
         .where(text("prayer_id IS NULL"))
+    )
+    result = await conn.execute(query)
+    return result.all()
+
+
+async def get_all_users(conn: AsyncSession, limit=5, page=1):
+    query = (
+        select(Users.id, Users.name, Users.email, Users.role)
+        .offset((page - 1) * limit)
+        .limit(limit)
     )
     result = await conn.execute(query)
     return result.all()

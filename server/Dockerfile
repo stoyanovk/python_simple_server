@@ -1,4 +1,6 @@
-FROM python:3.11.2-alpine3.16
+FROM python:3.11.3-bullseye
+
+RUN pip3 install "pip>=20"
 
 WORKDIR /work/server
 

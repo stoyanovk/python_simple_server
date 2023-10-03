@@ -14,7 +14,7 @@
       <a href="/prayers/{{item.id}}">
         <h5>{{ item.title }}</h5>
       </a>
-      <p>{{ item.short_description }}</p>
+      <p>{{ item.description }}</p>
       {% if user.id == item.user_id %}
       <div class="d-flex">
         <a class="me-4 btn btn-primary" href="/prayers/edit/{{item.id}}">edit prayer</a>

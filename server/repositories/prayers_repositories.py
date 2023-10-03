@@ -11,7 +11,7 @@ async def select_prayers(conn: AsyncSession, limit: int, page: int):
             Prayers.id,
             Prayers.title,
             Prayers.user_id,
-            func.substr(Prayers.text, 0, 100).label("short_description"),
+            func.substr(Prayers.text, 0, 100).label("description"),
         )
         .offset((page - 1) * limit)
         .limit(limit)
@@ -76,7 +76,7 @@ async def get_assigned_prayers_by_user_id(conn: AsyncSession, user_id: int):
             Prayers.id,
             Prayers.title,
             Users_prayers.user_id,
-            func.substr(Prayers.text, 0, 100).label("short_description"),
+            func.substr(Prayers.text, 0, 100).label("description"),
         )
         .join(Users_prayers)
         .filter(Users_prayers.user_id == user_id)
@@ -100,15 +100,12 @@ async def assign_prayer_to_user(
     await conn.commit()
 
 
-async def get_prayer_users(conn, prayer_id):
-    query = (
-        select(Users.id, Users.name, Users_prayers.prayer_id)
-        .join(
-            Users_prayers,
-            and_(
-                Users.id == Users_prayers.user_id, Users_prayers.prayer_id == prayer_id
-            ),
-        )
+async def get_prayer_users(conn, prayer_id) -> tuple[int, str, int]:
+    query = select(
+        Users.id, Users.name, Users.role, Users.email, Users_prayers.prayer_id
+    ).join(
+        Users_prayers,
+        and_(Users.id == Users_prayers.user_id, Users_prayers.prayer_id == prayer_id),
     )
     result = await conn.execute(query)
     return result.all()

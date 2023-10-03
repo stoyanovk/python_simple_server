@@ -3,13 +3,12 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
 )
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.orm import mapped_column, Mapped
 from db.init_db import reg
-from typing import TYPE_CHECKING
 
 
-if TYPE_CHECKING:
-    from db.users import Users
+# if TYPE_CHECKING:
+#     from db.users import Users
 
 
 @reg.mapped_as_dataclass()
@@ -22,4 +21,3 @@ class People:
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE")
     )
-    user: Mapped["Users"] = relationship(back_populates="people")

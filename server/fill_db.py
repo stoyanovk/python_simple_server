@@ -4,6 +4,7 @@ from lib.password_utils import generate_password
 from sqlalchemy.sql import insert, select
 from db.users import Users, Roles
 from db.prayers import Prayers
+from db.people import People
 import asyncio
 
 engine = get_async_engine(get_config())
@@ -11,7 +12,7 @@ engine = get_async_engine(get_config())
 
 async def fill_db():
     async with engine.begin() as session:
-        await session.run_sync(reg.metadata.drop_all)
+        # await session.run_sync(reg.metadata.drop_all)
         await session.run_sync(reg.metadata.create_all)
         await session.execute(
             insert(Users),
@@ -100,6 +101,55 @@ async def fill_db():
                     "title": "TEst 5",
                     "text": "lorem TEst TEst TEst TEstTEstTEst TEst",
                     "user_id": preacher.id,
+                },
+            ],
+        )
+
+    async with engine.begin() as session:
+        await session.execute(
+            insert(People),
+            [
+                {
+                    "name": "John",
+                    "last_visit": None,
+                    "user_id": preacher.id,
+                    "view_count": 0,
+                },
+                {
+                    "name": "Jack",
+                    "last_visit": None,
+                    "user_id": preacher.id,
+                    "view_count": 0,
+                },
+                {
+                    "name": "Kenny",
+                    "last_visit": None,
+                    "user_id": None,
+                    "view_count": 0,
+                },
+                {
+                    "name": "Kenny",
+                    "last_visit": None,
+                    "user_id": preacher.id,
+                    "view_count": 0,
+                },
+                {
+                    "name": "Kenny 1",
+                    "last_visit": None,
+                    "user_id": None,
+                    "view_count": 0,
+                },
+                {
+                    "name": "Kenny 2",
+                    "last_visit": None,
+                    "user_id": None,
+                    "view_count": 0,
+                },
+                {
+                    "name": "Kenny 3",
+                    "last_visit": None,
+                    "user_id": None,
+                    "view_count": 0,
                 },
             ],
         )

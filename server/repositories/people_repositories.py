@@ -42,6 +42,15 @@ async def select_by_name(
     return result
 
 
+async def select_by_id(conn: AsyncSession, id: int) -> People | None:
+    query = select(People).where(
+        People.id == id,
+    )
+    records = await conn.execute(query)
+    result = records.scalar_one_or_none()
+    return result
+
+
 async def insert_person(
     conn: AsyncSession, name: str, user_id: int | None = None
 ) -> None:

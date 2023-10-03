@@ -1,10 +1,10 @@
 build:
 	docker-compose build server
 
-run:
+run-server:
 	docker-compose up server
 
-fill-db:
+fill-db: build
 	docker-compose run fill-db
 
 db:
@@ -27,3 +27,6 @@ types: build
 
 tests: build
 	docker-compose run tests
+
+run-store:
+	make -j 2 db redis
